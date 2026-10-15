@@ -11,6 +11,13 @@ You cannot recover a contract's original source — it is not on-chain. What you
 this does: point it at an address, get back Solidity you can actually read, with
 real function and event names resolved from public signature databases.
 
+> **Provenance.** This repository is a capability test of an AI coding model. It
+> was written end to end by **DeepSeek V4.1 Flash** running in OpenCode, from a
+> series of prompts, and reviewed by a human along the way. Treat that as a
+> caveat rather than a credential: the decompiler output and the LLM safety
+> guards are precisely the things worth verifying yourself before relying on
+> them.
+
 ```console
 $ ./bin/evm-reverse 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 -o out/weth
 › fetching bytecode for 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
