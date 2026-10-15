@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>evm-reverse — decompile unverified contracts</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">◈</span>
+        <div>
+          <h1>evm<span>·</span>reverse</h1>
+          <p>Turn an unverified on-chain contract into readable Solidity</p>
+        </div>
+      </div>
+      <div class="health" id="health">
+        <span class="pill" id="health-heimdall">heimdall ?</span>
+        <span class="pill" id="health-llm">ollama ?</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel controls">
+        <form id="form">
+          <label class="field">
+            <span>Contract address</span>
+            <input id="address" name="address" placeholder="0x…" spellcheck="false" autocomplete="off" required />
+          </label>
+
+          <label class="field">
+            <span>RPC URL <em>(optional — falls back to public endpoints)</em></span>
+            <input id="rpcUrl" name="rpcUrl" placeholder="https://eth.llamarpc.com" spellcheck="false" autocomplete="off" />
+          </label>
+
+          <fieldset class="options">
+            <legend>Options</legend>
+
+            <label class="check">
+              <input type="checkbox" id="storage" />
+              <span>Scan storage slots <em>(0..63)</em></span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" id="includeProxy" />
+              <span>Also decompile the proxy shell</span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" id="llm" />
+              <span>LLM readability pass <em>(rename vars, add comments)</em></span>
+            </label>
+
+            <label class="field sub">
+              <span>Per-function timeout (ms) <em>(lower = faster, less complete)</em></span>
+              <input id="perFunctionMs" type="number" min="1000" step="1000" placeholder="leave blank for default" />
+            </label>
+          </fieldset>
+
+          <fieldset class="options">
+            <legend>LLM pass</legend>
+
+            <label class="check">
+              <input type="checkbox" id="llm" />
+              <span>Enabled <em>(rename vars, add comments)</em></span>
+            </label>
+
+            <label class="field sub">
+              <span>Model</span>
+              <div class="row">
+                <select id="llmModel"></select>
+                <button type="button" class="ghost small" id="refreshModels" title="Reload models from the endpoint">↻</button>
+              </div>
+            </label>
+
+            <label class="field sub">
+              <span>Ollama API URL <em>(local or remote)</em></span>
+              <input id="llmUrl" placeholder="http://127.0.0.1:11434" spellcheck="false" autocomplete="off" />
+            </label>
+
+            <label class="field sub">
+              <span>API key <em>(optional; for ollama.com or authenticated endpoints)</em></span>
+              <input id="llmApiKey" type="password" placeholder="leave blank for local" autocomplete="off" />
+            </label>
+          </fieldset>
+
+          <button type="submit" id="submit">Reverse</button>
+          <button type="button" id="cancel" class="ghost" hidden>Cancel</button>
+        </form>
+
+        <div class="log" id="log" aria-live="polite"></div>
+      </section>
+
+      <section class="panel output">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="solidity">Solidity</button>
+          <button class="tab" data-tab="abi">ABI</button>
+          <button class="tab" data-tab="metadata">Metadata</button>
+          <div class="spacer"></div>
+          <button class="ghost small" id="copy">Copy</button>
+          <button class="ghost small" id="download">Download</button>
+        </div>
+
+        <div class="tabpanes">
+          <pre class="pane active" id="pane-solidity"><span class="placeholder">Decompiled Solidity will appear here.</span></pre>
+          <pre class="pane" id="pane-abi"><span class="placeholder">ABI will appear here.</span></pre>
+          <pre class="pane" id="pane-metadata"><span class="placeholder">Run metadata will appear here.</span></pre>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

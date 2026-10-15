@@ -1,0 +1,55 @@
+{
+  "name": "evm-reverse",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reverse-engineer unverified EVM smart contracts from an on-chain address into readable Solidity.",
+  "type": "module",
+  "license": "MIT",
+  "author": "",
+  "homepage": "https://github.com/OWNER/REPO#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OWNER/REPO.git"
+  },
+  "bugs": {
+    "url": "https://github.com/OWNER/REPO/issues"
+  },
+  "keywords": [
+    "ethereum",
+    "evm",
+    "smart-contracts",
+    "decompiler",
+    "decompilation",
+    "reverse-engineering",
+    "solidity",
+    "bytecode",
+    "heimdall",
+    "abi"
+  ],
+  "bin": {
+    "evm-reverse": "./bin/evm-reverse"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "web/",
+    "plugins/",
+    "scripts/",
+    "test/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node src/cli.ts",
+    "serve": "node src/server.ts",
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}
