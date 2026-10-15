@@ -70,6 +70,15 @@ mkdir -p "$DEST_PLUGINS"
 rm -rf "$DEST_PLUGINS/evm-reverse"
 cp -r "$SRC" "$DEST_PLUGINS/evm-reverse"
 
+# Record this machine's paths so the plugin works without editing its source.
+cat > "$DEST_PLUGINS/evm-reverse/evm-reverse.config.json" <<JSON
+{
+  "cliPath": "$REPO_DIR/bin/evm-reverse",
+  "outDir": "$HOME/reversed",
+  "wslHome": "$HOME"
+}
+JSON
+
 HOST_PLUGIN_PATH="$(to_host_path "$DEST_PLUGINS/evm-reverse")"
 
 CONFIG="$CONFIG_DIR/opencode.jsonc"
@@ -93,5 +102,8 @@ fi
 
 echo "--- installed plugin ---"
 find "$DEST_PLUGINS/evm-reverse" -type f | sed "s|^|  |"
+echo
+echo "plugin will run: $REPO_DIR/bin/evm-reverse"
+echo "output dir:      $HOME/reversed"
 echo
 echo "restart OpenCode so the plugin is picked up."

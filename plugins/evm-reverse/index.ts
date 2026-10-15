@@ -10,19 +10,44 @@
  */
 
 import { execFile, execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { Plugin } from "@opencode/plugin";
 
 const execFileAsync = promisify(execFile);
 
 /**
- * The CLI and Heimdall live inside WSL while OpenCode runs on the Windows host,
- * so default paths have to be resolved through WSL. Override with
- * EVM_REVERSE_WSL_HOME or EVM_REVERSE_CLI if your layout differs.
+ * Machine-local paths, written next to this file by scripts/install-plugin.sh.
+ * Keeping them out of the repo is what lets the plugin work on someone else's
+ * machine without editing source.
+ */
+interface LocalConfig {
+  cliPath?: string;
+  outDir?: string;
+  wslHome?: string;
+}
+
+function loadLocalConfig(): LocalConfig {
+  try {
+    const here = dirname(fileURLToPath(import.meta.url));
+    return JSON.parse(readFileSync(join(here, "evm-reverse.config.json"), "utf8")) as LocalConfig;
+  } catch {
+    return {};
+  }
+}
+
+const CONFIG = loadLocalConfig();
+
+/**
+ * The CLI and Heimdall may live inside WSL while OpenCode runs on the Windows
+ * host, so the fallback path has to be resolved through WSL. Env always wins.
  */
 function resolveWslHome(): string {
   if (process.env.EVM_REVERSE_WSL_HOME) return process.env.EVM_REVERSE_WSL_HOME;
+  if (CONFIG.wslHome) return CONFIG.wslHome;
   if (process.platform !== "win32") return homedir();
   try {
     const out = execFileSync("wsl", ["bash", "-lc", "echo $HOME"], { encoding: "utf8" }).trim();
@@ -33,8 +58,15 @@ function resolveWslHome(): string {
 }
 
 const WSL_HOME = resolveWslHome();
-const CLI_PATH = process.env.EVM_REVERSE_CLI ?? `${WSL_HOME}/evm-reverse/bin/evm-reverse`;
-const DEFAULT_OUT = process.env.EVM_REVERSE_OUTDIR ?? `${WSL_HOME}/reversed`;
+
+// Resolution order: explicit env, the paths recorded at install time, then a
+// sensible default ("evm-reverse" on PATH for POSIX, the usual clone location
+// inside WSL for Windows hosts).
+const CLI_PATH =
+  process.env.EVM_REVERSE_CLI ??
+  CONFIG.cliPath ??
+  (process.platform === "win32" ? `${WSL_HOME}/evm-reverse/bin/evm-reverse` : "evm-reverse");
+const DEFAULT_OUT = process.env.EVM_REVERSE_OUTDIR ?? CONFIG.outDir ?? `${WSL_HOME}/reversed`;
 const MAX_CHARS = 120_000;
 
 interface ReverseInput {
