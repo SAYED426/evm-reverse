@@ -5,14 +5,14 @@
   "description": "Reverse-engineer unverified EVM smart contracts from an on-chain address into readable Solidity.",
   "type": "module",
   "license": "MIT",
-  "author": "",
-  "homepage": "https://github.com/OWNER/REPO#readme",
+  "author": "SAYED426",
+  "homepage": "https://github.com/SAYED426/evm-reverse#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OWNER/REPO.git"
+    "url": "git+https://github.com/SAYED426/evm-reverse.git"
   },
   "bugs": {
-    "url": "https://github.com/OWNER/REPO/issues"
+    "url": "https://github.com/SAYED426/evm-reverse/issues"
   },
   "keywords": [
     "ethereum",

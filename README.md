@@ -1,12 +1,8 @@
-<!--
-  Replace OWNER/REPO with your GitHub path before publishing (badges + links).
--->
-
 # evm-reverse
 
 **Turn an unverified smart contract address into readable Solidity.**
 
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![CI](https://github.com/SAYED426/evm-reverse/actions/workflows/ci.yml/badge.svg)](https://github.com/SAYED426/evm-reverse/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node >= 22.18](https://img.shields.io/badge/node-%3E%3D%2022.18-brightgreen.svg)](https://nodejs.org)
 
@@ -82,7 +78,7 @@ generated header says so too.
 - **[Ollama](https://ollama.com)** — optional, only for the `--llm` pass.
 
 ```bash
-git clone https://github.com/OWNER/REPO.git
+git clone https://github.com/SAYED426/evm-reverse.git
 cd REPO
 
 npm install                    # typescript + @types/node, nothing else
@@ -243,24 +239,39 @@ A generative pass that quietly changes behaviour would be worse than useless, so
 
 ## OpenCode tool
 
-`plugins/evm-reverse/` registers an `evm.reverse_contract` tool. OpenCode
-typically runs on the host while the CLI and Heimdall live in WSL, so on Windows
-the plugin shells out through `wsl bash`; the WSL home is discovered
-automatically and can be overridden.
+Optional. `plugins/evm-reverse/` registers an `evm.reverse_contract` tool so an
+OpenCode agent can decompile on its own. The CLI alone is enough if you do not
+use OpenCode.
 
 ```bash
-scripts/install-plugin.sh
-# then restart OpenCode
+scripts/install-plugin.sh   # copy the plugin + wire up local paths
+                            # then restart OpenCode
 ```
+
+The installer resolves your OpenCode config directory (or honours
+`EVM_REVERSE_OPENCODE_DIR`) and records this machine's paths — the CLI location,
+the output directory, and the WSL home — in an `evm-reverse.config.json` **next
+to the installed plugin**. Nothing machine-specific lives in the repository, so
+the same clone works anywhere.
+
+Path resolution at run time, highest priority first:
+
+1. environment (`EVM_REVERSE_CLI`, `EVM_REVERSE_OUTDIR`, `EVM_REVERSE_WSL_HOME`)
+2. the config written at install time
+3. a default — `evm-reverse` on `PATH` on Linux/macOS, or `$HOME/evm-reverse/bin/evm-reverse` inside WSL on Windows
+
+On Windows, OpenCode itself runs on the host while the CLI and Heimdall live in
+WSL, so the plugin shells out through `wsl bash`. On Linux and macOS it executes
+the CLI directly.
+
+`@opencode/plugin` is provided by OpenCode at load time — you do not need to
+install it, and the repo does not bundle it.
 
 | Input | Description |
 | --- | --- |
 | `address` | 0x address or raw bytecode (required) |
 | `rpcUrl`, `outDir`, `storage`, `perFunctionMs`, `hardfork` | Same meaning as the CLI |
 | `llm`, `llmModel`, `llmUrl`, `llmApiKey` | Same meaning as the CLI |
-
-Environment overrides: `EVM_REVERSE_WSL_HOME`, `EVM_REVERSE_CLI`,
-`EVM_REVERSE_OUTDIR`, `EVM_REVERSE_OPENCODE_DIR`.
 
 ## How it works
 
